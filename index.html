@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CYV Client Pricing Calculator</title>
+<meta name="description" content="Charter Yachts Vallarta client pricing, Stripe fee, FX, owner cost and profit calculator.">
+<style>
+:root{--ink:#102331;--muted:#61727e;--paper:#f5f7f8;--card:#fff;--line:#dbe3e7;--gold:#c89b3c;--sea:#0f6675;--good:#167447;--bad:#a43a2c;--shadow:0 18px 50px rgba(16,35,49,.10)}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#eef5f5,#f8f5ed);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1180px;margin:auto;padding:28px 16px 48px}.brand{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:22px}.eyebrow{color:var(--gold);font-weight:800;letter-spacing:.13em;text-transform:uppercase;font-size:12px}.brand h1{font-size:clamp(28px,4vw,46px);line-height:1.05;margin:7px 0 0;letter-spacing:-.04em}.brand p{color:var(--muted);margin:8px 0 0}.badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 13px;color:var(--sea);font-weight:700;white-space:nowrap}.layout{display:grid;grid-template-columns:360px 1fr;gap:18px}.card{background:var(--card);border:1px solid rgba(219,227,231,.9);border-radius:20px;box-shadow:var(--shadow);padding:20px}.card h2{font-size:18px;margin:0 0 16px}.field{margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}.field select,.field input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 11px;color:var(--ink);font:inherit}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.assumptions{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}.assumptions h3{font-size:13px;margin:0 0 10px}.tiny{font-size:12px;color:var(--muted)}.result-top{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.metric{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfcfc}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{font-size:25px;display:block;margin-top:5px}.profit strong{color:var(--good)}.waterfall{display:grid;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}.line{display:flex;justify-content:space-between;gap:16px;padding:12px 14px;border-bottom:1px solid var(--line)}.line:last-child{border-bottom:0}.line span:first-child{color:var(--muted)}.line.total{font-weight:800;background:#f2f8f6}.line.negative strong{color:var(--bad)}.line.highlight{background:#fff8e9}.section-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:900;margin:20px 0 8px}.note{margin-top:16px;padding:12px 14px;border-radius:12px;background:#f5f8fa;color:var(--muted);font-size:12px}.footer{margin-top:18px;text-align:center;color:var(--muted);font-size:12px}@media(max-width:800px){.layout{grid-template-columns:1fr}.result-top{grid-template-columns:1fr 1fr}.brand{align-items:flex-start;flex-direction:column}.badge{align-self:flex-start}}@media(max-width:430px){main{padding:18px 10px 32px}.card{padding:15px;border-radius:16px}.result-top{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><div><div class="eyebrow">Charter Yachts Vallarta</div><h1>Client pricing calculator</h1><p>Price the booking, expose every Stripe deduction, and see the real USD profit.</p></div><div class="badge">Internal pricing tool</div></div>
+  <div class="layout">
+    <section class="card" aria-label="Booking inputs">
+      <h2>Booking inputs</h2>
+      <div class="field"><label for="yacht">Yacht</label><select id="yacht"></select></div>
+      <div class="row"><div class="field"><label for="duration">Duration</label><select id="duration"></select></div><div class="field"><label for="guests">Guests</label><input id="guests" type="number" min="1" step="1" value="10"></div></div>
+      <div class="field"><label for="port">Pickup / movement port</label><select id="port"><option>Base port / no movement charge</option><option>Puerto Vallarta / Los Muertos</option><option>Nuevo Vallarta</option><option>La Cruz</option><option>Punta Mita</option></select></div>
+      <div class="row"><div class="field"><label for="movement">Movement cost USD</label><input id="movement" type="number" min="0" step="1" value="0"></div><div class="field"><label for="extraCost">Other cost USD</label><input id="extraCost" type="number" min="0" step="1" value="0"></div></div>
+      <div class="assumptions"><h3>Stripe and FX assumptions</h3><div class="row"><div class="field"><label for="fx">USD → MXN rate</label><input id="fx" type="number" min="0.01" step="0.0001" value="18.7046"></div><div class="field"><label for="processing">Processing %</label><input id="processing" type="number" min="0" step="0.001" value="4.107"></div></div><div class="row"><div class="field"><label for="conversion">Currency conversion %</label><input id="conversion" type="number" min="0" step="0.001" value="2"></div><div class="field"><label for="iva">IVA on Stripe fees %</label><input id="iva" type="number" min="0" step="0.1" value="16"></div></div><div class="tiny">Defaults are based on the observed CYV Stripe transaction waterfall: 4.107% processing, 2.000% currency conversion, and 16% IVA on Stripe fees. Edit them when the live account data changes.</div></div>
+    </section>
+    <section class="card" aria-live="polite"><h2 id="summary">40ft Lagoon · 6 Hours</h2><div class="result-top"><div class="metric"><span>Client charge</span><strong id="clientCharge">$0</strong></div><div class="metric"><span>Total operating cost</span><strong id="operatingCost">$0</strong></div><div class="metric profit"><span>Profit after Stripe / FX</span><strong id="profit">$0</strong></div></div><div class="metric" style="margin-bottom:14px"><span>Profit as % of total operating cost</span><strong id="profitPct">0%</strong></div><div class="section-title">Fee waterfall</div><div class="waterfall"><div class="line"><span>Published client price</span><strong id="wPrice">$0</strong></div><div class="line"><span>Gross settlement value</span><strong id="wGross">$0 MXN</strong></div><div class="line negative"><span>Stripe processing fee</span><strong id="wProcessing">-$0 MXN</strong></div><div class="line negative"><span>Stripe currency-conversion fee</span><strong id="wConversion">-$0 MXN</strong></div><div class="line negative"><span>IVA on Stripe fees</span><strong id="wIva">-$0 MXN</strong></div><div class="line total"><span>Net after Stripe deductions</span><strong id="wNet">$0 USD</strong></div><div class="line"><span>Yacht-owner cost</span><strong id="wOwner">$0 USD</strong></div><div class="line"><span>Additional passenger cost</span><strong id="wPassenger">$0 USD</strong></div><div class="line"><span>Movement cost</span><strong id="wMovement">$0 USD</strong></div><div class="line"><span>Other cost</span><strong id="wOther">$0 USD</strong></div><div class="line total highlight"><span>Final profit</span><strong id="wProfit">$0 USD</strong></div></div><div class="note" id="details"></div></section>
+  </div>
+  <div class="footer">Source of truth: CYV New Price spreadsheet. Calculator is an estimate until the completed Stripe transaction is reconciled.</div>
+</main>
+<script>
+const yachts=[
+['51ft Leopard','TWE',{3:3490,5:3995,6:4695},{3:2651,5:3051,6:3580},8,30],
+['40ft Lagoon','Raul',{4:2095,6:2390,8:2795},{4:1242,6:1343,8:1568},10,65],
+['42ft Lagoon','Raul',{4:2090,6:2395,8:2795},{4:1342,6:1433,8:1658},10,75],
+['47ft Pajot','Raquelle',{4:3290,6:4590,8:5490},{4:2660,6:3325,8:4163},10,220],
+['47ft Luxury Cat','Juan',{4:3890,6:5395,8:6150},{4:2475,6:3465,8:4005},10,95],
+['64ft Mickelson','Hugo',{4:4400,6:5250,8:5795},{4:2897,6:3450,8:3797},10,230],
+['35 Cabo','Hugo',{4:1395,6:1895,8:2395},{4:850,6:1218,8:1558},6,50],
+['52 Davis','Hugo',{4:5595,6:7350,8:9195},{4:3610,6:4310,8:5801},6,50],
+['36 Custom','Hugo',{4:995,6:1399,8:1695},{4:623,6:873,8:1110},6,50],
+['85 Don Mois','Effren',{4:8090,6:9195,8:10900},{4:4800,6:6000,8:7000},10,165],
+['90ft Cheoy Lee','Paul',{4:6195,6:8390,8:9950},{4:4000,6:5500,8:6500},10,90],
+['92ft President','Estaban',{4:5995,6:7495,8:9300},{4:3900,6:4900,8:5900},10,170],
+['122ft Hatteras','Hugo',{4:17395,6:19750,8:22100},{4:11286,6:11286,8:12791},10,295],
+['81ft Sailboat','Tim',{4:1795,6:2095,8:2690},{4:1150,6:1350,8:1750},10,90],
+['32ft Kata','Kata',{4:990,6:1295,8:1750},{4:null,6:null,8:null},8,null],
+['46ft SeaRa','Hugo',{4:1790,6:2595,8:3495},{4:894,6:1280,8:1658},10,75],
+['50ft Marquis','Hugo',{4:2895,6:3390,8:4420},{4:1700,6:2400,8:3000},10,75],
+['50ft SeaRay','Bernardo',{4:1395,6:1995,8:2670},{4:865,6:1297,8:1730},10,75],
+['52ft SeaRay','Hugo',{4:3700,6:4695,8:6795},{4:2400,6:3000,8:4450},10,125],
+['58ft GT','Hugo',{4:3995,6:5950,8:7650},{4:2600,6:3850,8:5050},10,125],
+['59ft Azimut','Gabriel',{4:2890,6:3990,8:5250},{4:null,6:null,8:null},10,95],
+['60ft Searay','Hugo',{4:3800,6:5695,8:7490},{4:2521,6:3748,8:4921},10,95],
+['65ft Vtech','Hugo',{4:3490,6:4995,8:6500},{4:2200,6:3250,8:4290},10,95],
+['75ft Hatteras','Doug',{4:3490,6:4095,8:4495},{4:2200,6:2650,8:2800},10,145],
+['85ft Viva','Hugo',{4:6795,6:8150,8:9300},{4:4180,6:5016,8:6061},10,165]
+];
+const $=id=>document.getElementById(id), money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0), mxn=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n||0)+' MXN', pct=n=>(n||0).toFixed(1)+'%';
+const yachtEl=$('yacht'),durationEl=$('duration'); yachts.forEach((y,i)=>{const o=document.createElement('option');o.value=i;o.textContent=y[0];yachtEl.appendChild(o)});
+function loadDurations(){const y=yachts[+yachtEl.value];durationEl.innerHTML='';Object.keys(y[2]).sort((a,b)=>a-b).forEach(h=>{const o=document.createElement('option');o.value=h;o.textContent=h+' Hours';durationEl.appendChild(o)}); if([...durationEl.options].some(o=>o.value==='6')) durationEl.value='6'; calculate()}
+function calculate(){const y=yachts[+yachtEl.value],h=+durationEl.value, guests=Math.max(1,+$('guests').value||1),price=y[2][h]||0,owner=y[3][h];const extra=Math.max(0,guests-y[4])*(y[5]||0);const fx=+$('fx').value||0,processing=(+$('processing').value||0)/100,conversion=(+$('conversion').value||0)/100,iva=(+$('iva').value||0)/100,movement=+$('movement').value||0,other=+$('extraCost').value||0;const gross=price*fx,proc=gross*processing,conv=gross*conversion,tax=(proc+conv)*iva,netUSD=fx?((gross-proc-conv-tax)/fx):0,operating=(owner||0)+extra+movement+other,profit=netUSD-operating; $('summary').textContent=y[0]+' · '+h+' Hours'; $('clientCharge').textContent=money(price);$('operatingCost').textContent=money(operating);$('profit').textContent=money(profit);$('profitPct').textContent=operating?pct(profit/operating*100):'n/a';$('wPrice').textContent=money(price);$('wGross').textContent=mxn(gross);$('wProcessing').textContent='-'+mxn(proc);$('wConversion').textContent='-'+mxn(conv);$('wIva').textContent='-'+mxn(tax);$('wNet').textContent=money(netUSD)+' USD';$('wOwner').textContent=owner==null?'Not available in USD':money(owner)+' USD';$('wPassenger').textContent=money(extra)+' USD';$('wMovement').textContent=money(movement)+' USD';$('wOther').textContent=money(other)+' USD';$('wProfit').textContent=money(profit)+' USD';$('details').textContent=owner==null?'This yacht has owner costs recorded in MXD or missing in the source sheet. Enter the owner cost in USD before relying on the profit result.':'Assumption check: '+guests+' guests, '+money(extra)+' additional passenger cost, FX rate '+fx.toFixed(4)+' MXN/USD. Stripe deductions total '+mxn(proc+conv+tax)+' ('+money((proc+conv+tax)/fx)+').'}
+yachtEl.addEventListener('change',loadDurations);[durationEl,'guests','port','movement','extraCost','fx','processing','conversion','iva'].forEach(x=>x.addEventListener('input',calculate));loadDurations();
+</script>
+</body></html>
